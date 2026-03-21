@@ -239,4 +239,12 @@ EXPORT int memsys_get_config_property(memsys_t memsys, char* id) {
     }
     return -1;
 }
+ 
+EXPORT float memsys_get_tck(memsys_t memsys) {
+    Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
+    if (w && w->memsys) {
+        return w->memsys->GetTCK();
+    }
+    return -1;
+}
 }
