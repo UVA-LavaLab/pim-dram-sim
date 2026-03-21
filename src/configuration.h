@@ -63,6 +63,7 @@ class Config {
     int CWL;
     int RL;
     int WL;
+    int BIL;
     int tCCD_L;
     int tCCD_S;
     int tRTRS;

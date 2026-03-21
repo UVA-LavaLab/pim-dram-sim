@@ -143,6 +143,9 @@ int MemorySystem::GetConfigParameter(std::string identifier) {
     if (identifier == "ch_pos") {
         return config_->ch_pos;
     }
+    if (identifier == "BIL") {
+      return config_->BIL;
+    }
     return -1;
 }
 

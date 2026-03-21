@@ -339,6 +339,8 @@ void Config::InitTimingParams() {
     // calculated timing
     RL = AL + CL;
     WL = AL + CWL;
+    // time to ping any bank
+    BIL = RL - tCCD_L;
     read_delay = RL + burst_cycle;
     write_delay = WL + burst_cycle;
     return;
