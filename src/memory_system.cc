@@ -146,6 +146,69 @@ int MemorySystem::GetConfigParameter(std::string identifier) {
     if (identifier == "BIL") {
       return config_->BIL;
     }
+    if (identifier == "tFAW") {
+      return config_->tFAW;
+    }
+    if (identifier == "AL") {
+      return config_->AL;
+    }
+    if (identifier == "CL") {
+      return config_->CL;
+    }
+    if (identifier == "CWL") {
+      return config_->CWL;
+    }
+    if (identifier == "tRCD") {
+      return config_->tRCD;
+    }
+    if (identifier == "tRP") {
+      return config_->tRP;
+    }
+    if (identifier == "tRFC") {
+      return config_->tRFC;
+    }
+    if (identifier == "tREFI") {
+      return config_->tREFI;
+    }
+    if (identifier == "tRPRE") {
+      return config_->tRPRE;
+    }
+    if (identifier == "tWPRE") {
+      return config_->tWPRE;
+    }
+    if (identifier == "tWTR_S") {
+      return config_->tWTR_S;
+    }
+    if (identifier == "tWTR_L") {
+      return config_->tWTR_L;
+    }
+    if (identifier == "tWR") {
+      return config_->tWR;
+    }
+    if (identifier == "tRRD_S") {
+      return config_->tRRD_S;
+    }
+    if (identifier == "tRRD_L") {
+      return config_->tRRD_L;
+    }
+    if (identifier == "tXS") {
+      return config_->tXS;
+    }
+    if (identifier == "tXP") {
+      return config_->tXP;
+    }
+    if (identifier == "tRFCb") {
+      return config_->tRFCb;
+    }
+    if (identifier == "tREFIb") {
+      return config_->tREFIb;
+    }
+    if (identifier == "tRTRS") {
+      return config_->tRTRS;
+    }
+    if (identifier == "tRTP") {
+      return config_->tRTP;
+    }
     return -1;
 }
 
