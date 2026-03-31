@@ -261,7 +261,7 @@ uint64_t MemorySystem::GetSpatialGlobalAddr(uint64_t channel, uint64_t rank,
     pos += count_ones(config_->bg_mask);
     global_addr += (rank & (config_-> ra_mask)) << pos;
     pos += count_ones(config_->ra_mask);
-    global_addr += (channel & (config_->ch_mask) << pos);
+    global_addr += (channel & (config_->ch_mask)) << pos;
     return global_addr;
 }
 
