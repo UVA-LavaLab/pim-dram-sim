@@ -51,7 +51,7 @@ void MemorySystem::GetBytes(size_t start_addr, int64_t *data_index, size_t *star
         return;
     }
     (*data_index) = index;
-    (*start_byte) = (start_addr - base_addr) + offset;
+    (*start_byte) = ((start_addr - base_addr) << config_->shift_bits) + offset;
 }
 
 void MemorySystem::GlobalToLocalAddr(uint64_t* channel, uint64_t* rank,

@@ -231,6 +231,8 @@ void ChannelState::UpdateOtherBanksSameBankgroupTiming(
     const Address& addr,
     const std::vector<std::pair<CommandType, int>>& cmd_timing_list,
     uint64_t clk) {
+    if (is_pim_mode_)
+        return;
     for (auto k = 0; k < config_.banks_per_group; k++) {
         if (k != addr.bank) {
             for (auto cmd_timing : cmd_timing_list) {
@@ -246,6 +248,8 @@ void ChannelState::UpdateOtherBankgroupsSameRankTiming(
     const Address& addr,
     const std::vector<std::pair<CommandType, int>>& cmd_timing_list,
     uint64_t clk) {
+    if (is_pim_mode_)
+        return;
     for (auto j = 0; j < config_.bankgroups; j++) {
         if (j != addr.bankgroup) {
             for (auto k = 0; k < config_.banks_per_group; k++) {
@@ -263,6 +267,8 @@ void ChannelState::UpdateOtherRanksTiming(
     const Address& addr,
     const std::vector<std::pair<CommandType, int>>& cmd_timing_list,
     uint64_t clk) {
+    if (is_pim_mode_)
+        return;
     for (auto i = 0; i < config_.ranks; i++) {
         if (i != addr.rank) {
             for (auto j = 0; j < config_.bankgroups; j++) {
@@ -282,6 +288,8 @@ void ChannelState::UpdateSameRankTiming(
     const Address& addr,
     const std::vector<std::pair<CommandType, int>>& cmd_timing_list,
     uint64_t clk) {
+    if (is_pim_mode_)
+        return;
     for (auto j = 0; j < config_.bankgroups; j++) {
         for (auto k = 0; k < config_.banks_per_group; k++) {
             for (auto cmd_timing : cmd_timing_list) {
@@ -300,6 +308,8 @@ void ChannelState::UpdateTimingAndStates(const Command& cmd, uint64_t clk) {
 }
 
 bool ChannelState::ActivationWindowOk(int rank, uint64_t curr_time) const {
+    if (is_pim_mode_) 
+        return true;
     bool tfaw_ok = IsFAWReady(rank, curr_time);
     if (config_.IsGDDR()) {
         if (!tfaw_ok)
@@ -311,21 +321,26 @@ bool ChannelState::ActivationWindowOk(int rank, uint64_t curr_time) const {
 }
 
 void ChannelState::UpdateActivationTimes(int rank, uint64_t curr_time) {
-    if (!four_aw_[rank].empty() && curr_time >= four_aw_[rank][0]) {
-        four_aw_[rank].erase(four_aw_[rank].begin());
-    }
-    four_aw_[rank].push_back(curr_time + config_.tFAW);
-    if (config_.IsGDDR()) {
-        if (!thirty_two_aw_[rank].empty() &&
-            curr_time >= thirty_two_aw_[rank][0]) {
-            thirty_two_aw_[rank].erase(thirty_two_aw_[rank].begin());
+    if (!is_pim_mode_) {
+        if (!four_aw_[rank].empty() && curr_time >= four_aw_[rank][0]) {
+            four_aw_[rank].erase(four_aw_[rank].begin());
         }
-        thirty_two_aw_[rank].push_back(curr_time + config_.t32AW);
+        four_aw_[rank].push_back(curr_time + config_.tFAW);
+        if (config_.IsGDDR()) {
+            if (!thirty_two_aw_[rank].empty() &&
+                curr_time >= thirty_two_aw_[rank][0]) {
+                thirty_two_aw_[rank].erase(thirty_two_aw_[rank].begin());
+            }
+            thirty_two_aw_[rank].push_back(curr_time + config_.t32AW);
+        }
+        return;
     }
-    return;
 }
 
 bool ChannelState::IsFAWReady(int rank, uint64_t curr_time) const {
+    if (is_pim_mode_) {
+        return true;
+    }
     if (!four_aw_[rank].empty()) {
         if (curr_time < four_aw_[rank][0] && four_aw_[rank].size() >= 4) {
             return false;
@@ -335,6 +350,8 @@ bool ChannelState::IsFAWReady(int rank, uint64_t curr_time) const {
 }
 
 bool ChannelState::Is32AWReady(int rank, uint64_t curr_time) const {
+    if (is_pim_mode_)
+        return true;
     if (!thirty_two_aw_[rank].empty()) {
         if (curr_time < thirty_two_aw_[rank][0] &&
             thirty_two_aw_[rank].size() >= 32) {
