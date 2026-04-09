@@ -51,7 +51,7 @@ void MemorySystem::GetBytes(size_t start_addr, int64_t *data_index, size_t *star
         return;
     }
     (*data_index) = index;
-    (*start_byte) = ((start_addr - base_addr) << config_->shift_bits) + offset;
+    (*start_byte) = ((start_addr - base_addr) << config_->gdl_shift) + offset;
 }
 
 void MemorySystem::GlobalToLocalAddr(uint64_t* channel, uint64_t* rank,
@@ -105,7 +105,7 @@ int MemorySystem::GetConfigParameter(std::string identifier) {
         return config_->shift_bits;
     }
     if (identifier == "gdl_width") {
-        return config_->device_width * config_->BL;
+        return config_->gdl_width;
     }
     if (identifier == "ro_mask") {
         return config_->ro_mask;

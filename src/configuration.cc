@@ -351,6 +351,8 @@ void Config::SetAddressMapping() {
     // multiple bytes because of bus width, and burst length
     request_size_bytes = bus_width / 8 * BL;
     shift_bits = LogBase2(request_size_bytes);
+    gdl_width = device_width * BL;
+    gdl_shift = LogBase2(gdl_width / 8);
     int col_low_bits = LogBase2(BL);
     int actual_col_bits = LogBase2(columns) - col_low_bits;
 

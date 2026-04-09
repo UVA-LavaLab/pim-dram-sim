@@ -51,7 +51,7 @@ class Config {
     int BL;
 
     // Address mapping numbers
-    int shift_bits;
+    int shift_bits, gdl_shift, gdl_width;
     int ch_pos, ra_pos, bg_pos, ba_pos, ro_pos, co_pos;
     uint64_t ch_mask, ra_mask, bg_mask, ba_mask, ro_mask, co_mask;
 
