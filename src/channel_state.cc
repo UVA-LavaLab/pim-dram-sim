@@ -361,4 +361,8 @@ bool ChannelState::Is32AWReady(int rank, uint64_t curr_time) const {
     return true;
 }
 
+int ChannelState::GetActiveRow(uint64_t rank, uint64_t bankgroup, uint64_t bank) {
+    return bank_states_[rank][bankgroup][bank].OpenRow();
+}
+
 }  // namespace dramsim3

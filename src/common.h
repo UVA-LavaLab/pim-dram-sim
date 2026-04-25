@@ -7,6 +7,8 @@
 #include <vector>
 #include <map>
 
+#define ELINE fprintf(stderr, "to line %d in file %s\n", __LINE__, __FILE__);
+
 namespace dramsim3 {
 
 struct Address {

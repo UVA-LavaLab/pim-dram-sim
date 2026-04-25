@@ -1,6 +1,7 @@
 #ifndef __DRAM_SYSTEM_H
 #define __DRAM_SYSTEM_H
 
+#include <cstdint>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -43,6 +44,7 @@ class BaseDRAMSystem {
 
     std::function<void(uint64_t req_id)> read_callback_, write_callback_;
     static int total_channels_;
+    int GetActiveRow(uint64_t channel, uint64_t rank, uint64_t bankgroup, uint64_t bank);
 
    protected:
     uint64_t id_;

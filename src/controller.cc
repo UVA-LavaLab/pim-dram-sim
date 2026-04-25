@@ -1,4 +1,5 @@
 #include "controller.h"
+#include <cstdint>
 #include <iomanip>
 #include <ios>
 #include <iostream>
@@ -292,11 +293,6 @@ void Controller::IssueCommand(const Command &cmd) {
                 exit(1);
             }
             auto it = pending_pim_q_.find(cmd.hex_addr);
-            // FIXME: this might not be right, see config definition in 
-            // configuration.h / related calculation. It also factors in the
-            // the burst timing, which might overestimate time to read
-            // std::cerr << "read delay: " << config_.tCCD_L << std::endl;
-            // std::cerr << "READ cycle started: " << clk_ << "\t cycle ended: " << clk_ + config_.tCCD_L << std::endl;
             it->second.complete_cycle = clk_ + config_.tCCD_L;
             return_queue_.push_back(it->second);
             pending_pim_q_.erase(it);
@@ -326,15 +322,10 @@ void Controller::IssueCommand(const Command &cmd) {
                 exit(1);
             }
             auto it = pending_pim_q_.find(cmd.hex_addr);
-            // FIXME: this might not be right, see config definition in 
-            // configuration.h / related calculation. It also factors in the
-            // the burst timing, which might overestimate time to read
             it->second.complete_cycle = clk_ + config_.tCCD_L;
-            // std::cerr << "WRITE cycle started: " << clk_ << "\t cycle ended: " << clk_ + config_.tCCD_L << std::endl;
             return_queue_.push_back(it->second);
             pending_pim_q_.erase(it);
         } else {
-            // there should be only 1 write to the same location at a time
             auto it = pending_wr_q_.find(cmd.hex_addr);
             if (it == pending_wr_q_.end()) {
                 std::cerr << cmd.hex_addr << " not in write queue!" << std::endl;
@@ -447,6 +438,10 @@ void Controller::UpdateCommandStats(const Command &cmd) {
         default:
             AbruptExit(__FILE__, __LINE__);
     }
+}
+
+int Controller::GetActiveRow(uint64_t rank, uint64_t bankgroup, uint64_t bank) {
+    return channel_state_.GetActiveRow(rank, bankgroup, bank);
 }
 
 }  // namespace dramsim3

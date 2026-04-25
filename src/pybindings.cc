@@ -68,7 +68,8 @@ EXPORT void memsys_get_byte_range_from_bank(memsys_t memsys, uint64_t channel,
                                             size_t *start_idx) {
   Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
   if (w && w->memsys) {
-    uint64_t addr_start = w->memsys->GetSpatialGlobalAddr(channel, rank, bankgroup, bank, hex_address);
+    uint64_t addr_start = w->memsys->GetSpatialGlobalAddr(
+        channel, rank, bankgroup, bank, hex_address);
     w->memsys->GetBytes(addr_start, data_idx, start_idx);
   } else {
     (*data_idx) = -1;
@@ -81,8 +82,10 @@ EXPORT void memsys_mmap(memsys_t memsys, uint64_t channel, uint64_t rank,
                         int64_t data_idx, size_t length, size_t offset) {
   Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
   if (w && w->memsys) {
-    uint64_t addr_start = w->memsys->GetSpatialGlobalAddr(channel, rank, bankgroup, bank, hex_address);
-    uint64_t addr_end = addr_start + w->memsys->GetSpatialGlobalAddr(0, 0, 0, 0, length);
+    uint64_t addr_start = w->memsys->GetSpatialGlobalAddr(
+        channel, rank, bankgroup, bank, hex_address);
+    uint64_t addr_end =
+        addr_start + w->memsys->GetSpatialGlobalAddr(0, 0, 0, 0, length);
     w->memsys->MMap(data_idx, addr_start, addr_end, offset);
   }
 }
@@ -92,8 +95,10 @@ EXPORT void memsys_munmap(memsys_t memsys, uint64_t channel, uint64_t rank,
                           size_t base_address, size_t length) {
   Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
   if (w && w->memsys) {
-    uint64_t addr_start = w->memsys->GetSpatialGlobalAddr(channel, rank, bankgroup, bank, base_address);
-    uint64_t addr_end = addr_start + w->memsys->GetSpatialGlobalAddr(0, 0, 0, 0, length);
+    uint64_t addr_start = w->memsys->GetSpatialGlobalAddr(
+        channel, rank, bankgroup, bank, base_address);
+    uint64_t addr_end =
+        addr_start + w->memsys->GetSpatialGlobalAddr(0, 0, 0, 0, length);
     w->memsys->MUnmap(addr_start, addr_end);
   }
 }
@@ -217,34 +222,46 @@ EXPORT uint64_t memsys_get_address_from_physical_location(
   Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
   if (w && w->memsys) {
     return w->memsys->BankLocalToGlobalAddr(channel, rank, bankgroup, bank,
-                                       hex_address);
+                                            hex_address);
   }
   return 0;
 }
 
 EXPORT void memsys_get_physical_location_from_address(
-    memsys_t memsys, uint64_t* channel, uint64_t* rank, uint64_t* bankgroup,
-    uint64_t* bank, uint64_t* local_addr, uint64_t hex_address) {
+    memsys_t memsys, uint64_t *channel, uint64_t *rank, uint64_t *bankgroup,
+    uint64_t *bank, uint64_t *local_addr, uint64_t hex_address) {
   Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
   if (w && w->memsys) {
-    w->memsys->GlobalToLocalAddr(channel, rank, bankgroup,
-                                      bank, local_addr, hex_address);
+    w->memsys->GlobalToLocalAddr(channel, rank, bankgroup, bank, local_addr,
+                                 hex_address);
   }
 }
 
-EXPORT int memsys_get_config_property(memsys_t memsys, char* id) {
-    Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
-    if (w && w->memsys) {
-        return w->memsys->GetConfigParameter(std::string(id));
-    }
-    return -1;
+EXPORT int memsys_get_config_property(memsys_t memsys, char *id) {
+  Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
+  if (w && w->memsys) {
+    return w->memsys->GetConfigParameter(std::string(id));
+  }
+  return -1;
 }
- 
+
+EXPORT int memsys_get_active_row(memsys_t memsys, uint64_t channel,
+                                      uint64_t rank, uint64_t bankgroup,
+                                      uint64_t bank) {
+  Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
+  if (w && w->memsys) {
+    return w->memsys->GetActiveRow(channel, rank, bankgroup, bank);
+  }
+  // in case of failure, return -1
+  return -1;
+}
+
 EXPORT float memsys_get_tck(memsys_t memsys) {
-    Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
-    if (w && w->memsys) {
-        return w->memsys->GetTCK();
-    }
-    return -1;
+  Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
+  if (w && w->memsys) {
+    return w->memsys->GetTCK();
+  }
+  // in case of failure, return -1
+  return -1;
 }
 }

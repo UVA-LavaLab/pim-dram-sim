@@ -1,6 +1,8 @@
 #include "dram_system.h"
 
 #include <assert.h>
+#include <cstdint>
+#include <sys/types.h>
 
 namespace dramsim3 {
 
@@ -91,6 +93,10 @@ void BaseDRAMSystem::RegisterCallbacks(
     // TODO this should be propagated to controllers
     read_callback_ = read_callback;
     write_callback_ = write_callback;
+}
+
+int BaseDRAMSystem::GetActiveRow(uint64_t channel, uint64_t rank, uint64_t bankgroup, uint64_t bank) {
+    return ctrls_[channel]->GetActiveRow(rank, bankgroup, bank);
 }
 
 JedecDRAMSystem::JedecDRAMSystem(Config &config, const std::string &output_dir,

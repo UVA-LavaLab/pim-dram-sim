@@ -1,6 +1,7 @@
 #ifndef __CONTROLLER_H
 #define __CONTROLLER_H
 
+#include <cstdint>
 #include <fstream>
 #include <map>
 #include <unordered_set>
@@ -37,6 +38,7 @@ class Controller {
     void PrintFinalStats();
     void ResetStats() { simple_stats_.Reset(); }
     std::pair<uint64_t, int> ReturnDoneTrans(uint64_t clock);
+    int GetActiveRow(uint64_t rank, uint64_t bankgroup, uint64_t bank);
 
     int channel_id_;
 

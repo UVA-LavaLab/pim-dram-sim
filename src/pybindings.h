@@ -52,6 +52,7 @@ EXPORT uint64_t memsys_get_channels(memsys_t memsys);
 EXPORT uint64_t memsys_get_banks_per_bankgroup(memsys_t memsys);
 EXPORT uint64_t memsys_get_bankgroups_per_rank(memsys_t memsys);
 EXPORT int memsys_get_config_property(memsys_t memsys, char* id);
+EXPORT int memsys_get_active_row(memsys_t memsys, uint64_t channel, uint64_t rank, uint64_t bankgroup, uint64_t bank);
 EXPORT float memsys_get_tck(memsys_t memsys);
 }
 

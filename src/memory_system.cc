@@ -2,6 +2,7 @@
 #include <common.h>
 #include <cstddef>
 #include <cstdint>
+#include <ios>
 #include <sys/types.h>
 #include <utility>
 
@@ -30,6 +31,12 @@ MemorySystem::~MemorySystem() {
 }
 
 void MemorySystem::MMap(int64_t data_index, size_t start_addr, size_t end_addr, size_t offset) {
+    if (start_addr == end_addr) {
+        std::cerr << "ERROR: Attempted to map address interval [" << std::hex
+                  << start_addr << "," << end_addr
+                  << "), which includes zero addresses." << std::endl;
+        exit(1);
+    }
     mmap_->Assign(start_addr, end_addr, std::make_pair(data_index, offset));
 };
 
@@ -209,6 +216,12 @@ int MemorySystem::GetConfigParameter(std::string identifier) {
     if (identifier == "tRTP") {
       return config_->tRTP;
     }
+    if (identifier == "n_col") {
+      return config_->columns;
+    }
+    if (identifier == "n_row") {
+      return config_->rows;
+    }
     return -1;
 }
 
@@ -263,6 +276,10 @@ uint64_t MemorySystem::GetSpatialGlobalAddr(uint64_t channel, uint64_t rank,
     pos += count_ones(config_->ra_mask);
     global_addr += (channel & (config_->ch_mask)) << pos;
     return global_addr;
+}
+
+int MemorySystem::GetActiveRow(uint64_t channel, uint64_t rank, uint64_t bankgroup, uint64_t bank) {
+  return dram_system_->GetActiveRow(channel, rank, bankgroup, bank);
 }
 
 void MemorySystem::PrintStats() const { dram_system_->PrintStats(); }

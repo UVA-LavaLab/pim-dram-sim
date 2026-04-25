@@ -1,6 +1,7 @@
 #ifndef __CHANNEL_STATE_H
 #define __CHANNEL_STATE_H
 
+#include <cstdint>
 #include <vector>
 #include "bankstate.h"
 #include "common.h"
@@ -37,6 +38,8 @@ class ChannelState {
     };
 
     std::vector<int> rank_idle_cycles;
+    
+    int GetActiveRow(uint64_t channel, uint64_t bankgroup, uint64_t bank);
 
    private:
     const Config& config_;
