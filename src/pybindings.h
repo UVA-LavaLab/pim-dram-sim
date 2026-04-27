@@ -47,6 +47,11 @@ EXPORT uint64_t memsys_get_address_from_physical_location(
 EXPORT void memsys_get_physical_location_from_address(
     memsys_t memsys, uint64_t* channel, uint64_t* rank, uint64_t* bankgroup,
     uint64_t* bank, uint64_t* local_addr, uint64_t hex_address);
+EXPORT uint64_t memsys_get_canonical_from_phys(
+    memsys_t memsys, uint64_t channel, uint64_t rank, uint64_t bankgroup,
+    uint64_t bank, uint64_t hex_address);
+EXPORT uint64_t memsys_get_canonical_from_global(memsys_t memsys,
+                                                 uint64_t hex_address);
 EXPORT uint64_t memsys_get_ranks(memsys_t memsys);
 EXPORT uint64_t memsys_get_channels(memsys_t memsys);
 EXPORT uint64_t memsys_get_banks_per_bankgroup(memsys_t memsys);

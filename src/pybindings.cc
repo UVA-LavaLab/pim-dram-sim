@@ -237,6 +237,32 @@ EXPORT void memsys_get_physical_location_from_address(
   }
 }
 
+EXPORT uint64_t memsys_get_canonical_from_phys(memsys_t memsys,
+                                               uint64_t channel, uint64_t rank,
+                                               uint64_t bankgroup,
+                                               uint64_t bank,
+                                               uint64_t hex_address) {
+  Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
+  if (w && w->memsys) {
+    return w->memsys->GetSpatialGlobalAddr(channel, rank, bankgroup, bank,
+                                           hex_address);
+  }
+  return 0;
+}
+
+EXPORT uint64_t memsys_get_canonical_from_global(memsys_t memsys,
+                                                 uint64_t hex_address) {
+  Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
+  if (w && w->memsys) {
+    uint64_t channel, rank, bankgroup, bank, local;
+    w->memsys->GlobalToLocalAddr(&channel, &rank, &bankgroup, &bank, &local,
+                                 hex_address);
+    return w->memsys->GetSpatialGlobalAddr(channel, rank, bankgroup, bank,
+                                           hex_address);
+  }
+  return 0;
+}
+
 EXPORT int memsys_get_config_property(memsys_t memsys, char *id) {
   Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
   if (w && w->memsys) {
@@ -246,8 +272,8 @@ EXPORT int memsys_get_config_property(memsys_t memsys, char *id) {
 }
 
 EXPORT int memsys_get_active_row(memsys_t memsys, uint64_t channel,
-                                      uint64_t rank, uint64_t bankgroup,
-                                      uint64_t bank) {
+                                 uint64_t rank, uint64_t bankgroup,
+                                 uint64_t bank) {
   Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
   if (w && w->memsys) {
     return w->memsys->GetActiveRow(channel, rank, bankgroup, bank);
