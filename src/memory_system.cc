@@ -168,6 +168,15 @@ int MemorySystem::GetConfigParameter(std::string identifier) {
     if (identifier == "tRCD") {
       return config_->tRCD;
     }
+    if (identifier == "tRCDRD" || identifier == "tRCDWR") {
+      std::cerr << "Failed to read config parameter " 
+                << identifier << " reason: not implemented." 
+                << std::endl;
+      return -1;
+    }
+    if (identifier == "tRAS") {
+      return config_->tRAS;
+    }
     if (identifier == "tRP") {
       return config_->tRP;
     }
