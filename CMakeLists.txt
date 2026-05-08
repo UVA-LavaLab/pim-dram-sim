@@ -108,6 +108,7 @@ add_executable(dramsim3test EXCLUDE_FROM_ALL
 )
 target_link_libraries(dramsim3test Catch dramsim3)
 target_include_directories(dramsim3test PRIVATE src/)
+target_compile_definitions(dramsim3test PRIVATE CATCH_CONFIG_NO_POSIX_SIGNALS)
 
 # We have to use this custome command because there's a bug in cmake
 # that if you do `make test` it doesn't build your updated test files
