@@ -30,9 +30,6 @@ class MemorySystem {
     int GetClock() const { return dram_system_->GetClock(); };
     bool GetPimMode() const { return dram_system_->GetPimMode(); };
     void SetPimMode(bool mode) { dram_system_->SetPimMode(mode); };
-    void MMap(int64_t data_index, size_t start_addr, size_t end_addr, size_t offset);
-    void MUnmap(size_t start_addr, size_t end_addr);
-    void GetBytes(size_t start_addr, int64_t *data_index, size_t *start_byte);
     int GetConfigParameter(std::string identifier);
     uint64_t GetSpatialGlobalAddr(uint64_t channel, uint64_t rank, uint64_t bankgroup, uint64_t bank, uint64_t hex_addr);
     uint64_t BankLocalToGlobalAddr(uint64_t channel, uint64_t rank, uint64_t bankgroup, uint64_t bank, uint64_t hex_addr);
@@ -53,7 +50,6 @@ class MemorySystem {
     // here is safe
     Config *config_;
     BaseDRAMSystem *dram_system_;
-    IntervalMap<size_t, std::pair<int64_t, int64_t>> *mmap_;
 };
 
 MemorySystem* GetMemorySystem(const std::string &config_file, const std::string &output_dir,

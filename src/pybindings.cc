@@ -61,48 +61,6 @@ EXPORT memsys_t memsys_create(const char *config_file, const char *output_dir,
   return reinterpret_cast<memsys_t>(w);
 }
 
-EXPORT void memsys_get_byte_range_from_bank(memsys_t memsys, uint64_t channel,
-                                            uint64_t rank, uint64_t bankgroup,
-                                            uint64_t bank, uint64_t hex_address,
-                                            int64_t *data_idx,
-                                            size_t *start_idx) {
-  Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
-  if (w && w->memsys) {
-    uint64_t addr_start = w->memsys->GetSpatialGlobalAddr(
-        channel, rank, bankgroup, bank, hex_address);
-    w->memsys->GetBytes(addr_start, data_idx, start_idx);
-  } else {
-    (*data_idx) = -1;
-    (*start_idx) = 0;
-  }
-}
-
-EXPORT void memsys_mmap(memsys_t memsys, uint64_t channel, uint64_t rank,
-                        uint64_t bankgroup, uint64_t bank, uint64_t hex_address,
-                        int64_t data_idx, size_t length, size_t offset) {
-  Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
-  if (w && w->memsys) {
-    uint64_t addr_start = w->memsys->GetSpatialGlobalAddr(
-        channel, rank, bankgroup, bank, hex_address);
-    uint64_t addr_end =
-        addr_start + w->memsys->GetSpatialGlobalAddr(0, 0, 0, 0, length);
-    w->memsys->MMap(data_idx, addr_start, addr_end, offset);
-  }
-}
-
-EXPORT void memsys_munmap(memsys_t memsys, uint64_t channel, uint64_t rank,
-                          uint64_t bankgroup, uint64_t bank,
-                          size_t base_address, size_t length) {
-  Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
-  if (w && w->memsys) {
-    uint64_t addr_start = w->memsys->GetSpatialGlobalAddr(
-        channel, rank, bankgroup, bank, base_address);
-    uint64_t addr_end =
-        addr_start + w->memsys->GetSpatialGlobalAddr(0, 0, 0, 0, length);
-    w->memsys->MUnmap(addr_start, addr_end);
-  }
-}
-
 EXPORT void memsys_tick(memsys_t memsys) {
   Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
   if (w && w->memsys) {
@@ -204,14 +162,6 @@ EXPORT uint64_t memsys_get_bankgroups_per_rank(memsys_t memsys) {
   Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
   if (w && w->memsys) {
     return w->memsys->GetBankgroupsPerRank();
-  }
-  return 0;
-}
-
-EXPORT uint64_t memsys_set_default_callbacks(memsys_t memsys) {
-  Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
-  if (w && w->memsys) {
-    return w->memsys->GetBanksPerBG();
   }
   return 0;
 }

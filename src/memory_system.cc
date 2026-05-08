@@ -13,7 +13,6 @@ MemorySystem::MemorySystem(const std::string &config_file,
                            std::function<void(uint64_t)> write_callback)
     : config_(new Config(config_file, output_dir)) {
     // TODO: add compile-time option
-    mmap_ = new IntervalMap<size_t, std::pair<int64_t, int64_t>>(std::make_pair(-1, 0));
     // TODO: ideal memory type?
     if (config_->IsHMC()) {
         dram_system_ = new HMCMemorySystem(*config_, output_dir, read_callback,
@@ -27,38 +26,6 @@ MemorySystem::MemorySystem(const std::string &config_file,
 MemorySystem::~MemorySystem() {
     delete (dram_system_);
     delete (config_);
-    delete (mmap_);
-}
-
-void MemorySystem::MMap(int64_t data_index, size_t start_addr, size_t end_addr, size_t offset) {
-    if (start_addr == end_addr) {
-        std::cerr << "ERROR: Attempted to map address interval [" << std::hex
-                  << start_addr << "," << end_addr
-                  << "), which includes zero addresses." << std::endl;
-        exit(1);
-    }
-    mmap_->Assign(start_addr, end_addr, std::make_pair(data_index, offset));
-};
-
-void MemorySystem::MUnmap(size_t start_addr, size_t end_addr) {
-  mmap_->RemoveSurroundingInterval(start_addr, end_addr);
-}
-
-
-void MemorySystem::GetBytes(size_t start_addr, int64_t *data_index, size_t *start_byte) {
-    size_t base_addr = mmap_->GetBaseAddr(start_addr);
-    std::pair<int64_t, int64_t> p = (*mmap_)[start_addr];
-    int64_t index = p.first;
-    int64_t offset = p.second;
-    if (index == -1) {
-        std::cerr << "PIM memory access to unmapped region at address " 
-                  << std::hex << start_addr << "." << std::endl;
-        (*data_index) = static_cast<int64_t>(-1);
-        (*start_byte) = 0l;
-        return;
-    }
-    (*data_index) = index;
-    (*start_byte) = ((start_addr - base_addr) << config_->gdl_shift) + offset;
 }
 
 void MemorySystem::GlobalToLocalAddr(uint64_t* channel, uint64_t* rank,

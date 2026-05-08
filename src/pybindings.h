@@ -30,17 +30,6 @@ EXPORT bool memsys_add_transaction_to_bank(memsys_t memsys, uint64_t channel,
                                            uint64_t bank, uint64_t hex_address,
                                            bool is_write, bool is_pim);
 
-EXPORT void memsys_get_byte_range_from_bank(memsys_t memsys, uint64_t channel,
-                                            uint64_t rank, uint64_t bankgroup,
-                                            uint64_t bank, uint64_t hex_address,
-                                            int64_t *data_idx,
-                                            size_t *start_idx);
-EXPORT void memsys_mmap(memsys_t memsys, uint64_t channel, uint64_t rank,
-                        uint64_t bankgroup, uint64_t bank, uint64_t hex_address,
-                        int64_t data_idx, size_t length, size_t offset);
-EXPORT void memsys_munmap(memsys_t memsys, uint64_t channel, uint64_t rank,
-                          uint64_t bankgroup, uint64_t bank,
-                          size_t base_address, size_t length);
 EXPORT uint64_t memsys_get_address_from_physical_location(
     memsys_t memsys, uint64_t channel, uint64_t rank, uint64_t bankgroup,
     uint64_t bank, uint64_t hex_address);
