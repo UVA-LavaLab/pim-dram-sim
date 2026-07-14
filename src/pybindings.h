@@ -3,14 +3,15 @@
 
 #include <cstdint>
 #include <stdint.h>
-#include <sys/types.h>
 #include <string>
+#include <sys/types.h>
 
 extern "C" {
 #define EXPORT __attribute__((visibility("default")))
 
 typedef void *memsys_t;
 typedef void (*dramsim_callback_t)(uint64_t addr);
+typedef void (*context_callback_t)(void* context, uint64_t addr);
 EXPORT memsys_t memsys_create(const char *config_file, const char *output_dir,
                               dramsim_callback_t read_callback,
                               dramsim_callback_t write_callback);
@@ -20,6 +21,10 @@ EXPORT uint64_t memsys_get_cycle(memsys_t memsys);
 EXPORT void memsys_tick(memsys_t memsys);
 EXPORT void memsys_register_callbacks(memsys_t memsys, dramsim_callback_t rcb,
                                       dramsim_callback_t wcb);
+EXPORT void memsys_register_contextual_callbacks(memsys_t memsys,
+                                                 context_callback_t rccb,
+                                                 context_callback_t wccb,
+                                                 void *context);
 EXPORT bool memsys_add_transaction(memsys_t memsys, uint64_t hex_address,
                                    bool is_write, bool is_pim);
 EXPORT void memsys_toggle_mode(memsys_t memsys);
@@ -34,20 +39,30 @@ EXPORT uint64_t memsys_get_address_from_physical_location(
     memsys_t memsys, uint64_t channel, uint64_t rank, uint64_t bankgroup,
     uint64_t bank, uint64_t hex_address);
 EXPORT void memsys_get_physical_location_from_address(
-    memsys_t memsys, uint64_t* channel, uint64_t* rank, uint64_t* bankgroup,
-    uint64_t* bank, uint64_t* local_addr, uint64_t hex_address);
-EXPORT uint64_t memsys_get_canonical_from_phys(
-    memsys_t memsys, uint64_t channel, uint64_t rank, uint64_t bankgroup,
-    uint64_t bank, uint64_t hex_address);
+    memsys_t memsys, uint64_t *channel, uint64_t *rank, uint64_t *bankgroup,
+    uint64_t *bank, uint64_t *local_addr, uint64_t hex_address);
+EXPORT uint64_t memsys_get_canonical_from_phys(memsys_t memsys,
+                                               uint64_t channel, uint64_t rank,
+                                               uint64_t bankgroup,
+                                               uint64_t bank,
+                                               uint64_t hex_address);
 EXPORT uint64_t memsys_get_canonical_from_global(memsys_t memsys,
                                                  uint64_t hex_address);
 EXPORT uint64_t memsys_get_ranks(memsys_t memsys);
 EXPORT uint64_t memsys_get_channels(memsys_t memsys);
 EXPORT uint64_t memsys_get_banks_per_bankgroup(memsys_t memsys);
 EXPORT uint64_t memsys_get_bankgroups_per_rank(memsys_t memsys);
-EXPORT int memsys_get_config_property(memsys_t memsys, char* id);
-EXPORT int memsys_get_active_row(memsys_t memsys, uint64_t channel, uint64_t rank, uint64_t bankgroup, uint64_t bank);
+EXPORT int memsys_get_config_property(memsys_t memsys, char *id);
+EXPORT int memsys_get_active_row(memsys_t memsys, uint64_t channel,
+                                 uint64_t rank, uint64_t bankgroup,
+                                 uint64_t bank);
 EXPORT float memsys_get_tck(memsys_t memsys);
+EXPORT void memsys_get_local_from_spatial(memsys_t memsys, uint64_t *channel,
+                                          uint64_t *rank, uint64_t *bankgroup,
+                                          uint64_t *bank, uint64_t *local_addr,
+                                          uint64_t hex_address);
+EXPORT uint64_t memsys_get_global_from_spatial(memsys_t memsys,
+                                               uint64_t hex_address);
 }
 
 #endif

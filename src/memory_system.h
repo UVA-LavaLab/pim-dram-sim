@@ -31,6 +31,7 @@ class MemorySystem {
     bool GetPimMode() const { return dram_system_->GetPimMode(); };
     void SetPimMode(bool mode) { dram_system_->SetPimMode(mode); };
     int GetConfigParameter(std::string identifier);
+    void SpatialToLocalAddr(uint64_t* channel, uint64_t* rank, uint64_t* bankgroup, uint64_t* bank, uint64_t* local_addr, uint64_t hex_addr);
     uint64_t GetSpatialGlobalAddr(uint64_t channel, uint64_t rank, uint64_t bankgroup, uint64_t bank, uint64_t hex_addr);
     uint64_t BankLocalToGlobalAddr(uint64_t channel, uint64_t rank, uint64_t bankgroup, uint64_t bank, uint64_t hex_addr);
     void GlobalToLocalAddr(uint64_t* channel, uint64_t* rank, uint64_t* bankgroup, uint64_t* bank, uint64_t* local_addr, uint64_t hex_addr);

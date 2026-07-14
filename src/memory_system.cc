@@ -28,6 +28,22 @@ MemorySystem::~MemorySystem() {
     delete (config_);
 }
 
+void MemorySystem::SpatialToLocalAddr(uint64_t* channel, uint64_t* rank,
+                                uint64_t* bankgroup, uint64_t* bank, 
+                                uint64_t* local_addr, uint64_t hex_addr) {
+    uint64_t pos = count_ones(config_->co_mask);
+    uint64_t local_mask = (config_->ro_mask << pos) | config_->co_mask;
+    (*local_addr) = static_cast<uint64_t>(local_mask & hex_addr);
+    pos += count_ones(config_->ro_mask);
+    (*bank) = static_cast<uint64_t>((hex_addr >> pos) & config_->ba_mask);
+    pos += count_ones(config_->ba_mask);
+    (*bankgroup) = static_cast<uint64_t>((hex_addr >> pos) & config_->bg_mask);
+    pos += count_ones(config_->bg_mask);
+    (*rank) = static_cast<uint64_t>((hex_addr >> pos) & config_->ra_mask);
+    pos += count_ones(config_->ra_mask);
+    (*channel) = static_cast<uint64_t>((hex_addr >> pos) & config_->ch_mask);
+}
+
 void MemorySystem::GlobalToLocalAddr(uint64_t* channel, uint64_t* rank,
                                 uint64_t* bankgroup, uint64_t* bank, 
                                 uint64_t* local_addr, uint64_t hex_addr) {

@@ -44,6 +44,21 @@ struct Wrapper {
 
     memsys->RegisterCallbacks(rfun, wfun);
   }
+
+  void set_context_callbacks(context_callback_t rccb, context_callback_t wccb,
+                             void *context) {
+
+    std::function<void(uint64_t)> rfun = [rccb, context](uint64_t addr) {
+      if (rccb)
+        rccb(context, addr);
+    };
+    std::function<void(uint64_t)> wfun = [wccb, context](uint64_t addr) {
+      if (wccb)
+        wccb(context, addr);
+    };
+
+    memsys->RegisterCallbacks(rfun, wfun);
+  }
 };
 } // namespace
 
@@ -92,6 +107,15 @@ EXPORT void memsys_register_callbacks(memsys_t memsys, dramsim_callback_t rcb,
   Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
   if (w && w->memsys)
     w->set_callbacks(rcb, wcb);
+}
+
+EXPORT void memsys_register_contextual_callbacks(memsys_t memsys,
+                                                 context_callback_t rccb,
+                                                 context_callback_t wccb,
+                                                 void *context) {
+  Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
+  if (w && w->memsys)
+    w->set_context_callbacks(rccb, wccb, context);
 }
 
 EXPORT bool memsys_add_transaction(memsys_t memsys, uint64_t hex_address,
@@ -208,9 +232,33 @@ EXPORT uint64_t memsys_get_canonical_from_global(memsys_t memsys,
     w->memsys->GlobalToLocalAddr(&channel, &rank, &bankgroup, &bank, &local,
                                  hex_address);
     return w->memsys->GetSpatialGlobalAddr(channel, rank, bankgroup, bank,
-                                           hex_address);
+                                           local);
   }
   return 0;
+}
+
+EXPORT uint64_t memsys_get_global_from_spatial(memsys_t memsys,
+                                               uint64_t hex_address) {
+  Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
+  if (w && w->memsys) {
+    uint64_t channel, rank, bankgroup, bank, local;
+    w->memsys->SpatialToLocalAddr(&channel, &rank, &bankgroup, &bank, &local,
+                                  hex_address);
+    return w->memsys->BankLocalToGlobalAddr(channel, rank, bankgroup, bank,
+                                            local);
+  }
+  return 0;
+}
+
+EXPORT void memsys_get_local_from_spatial(memsys_t memsys, uint64_t *channel,
+                                          uint64_t *rank, uint64_t *bankgroup,
+                                          uint64_t *bank, uint64_t *local_addr,
+                                          uint64_t hex_address) {
+  Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
+  if (w && w->memsys) {
+    w->memsys->SpatialToLocalAddr(channel, rank, bankgroup, bank, local_addr,
+                                  hex_address);
+  }
 }
 
 EXPORT int memsys_get_config_property(memsys_t memsys, char *id) {
