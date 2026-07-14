@@ -30,7 +30,6 @@ Controller::Controller(int channel, const Config &config, const Timing &timing)
                           : RowBufPolicy::OPEN_PAGE),
       last_trans_clk_(0),
       write_draining_(0) {
-      // FIXME: this is a guess, but should actually be reserving a value closer to the total number of banks in a PIM device
       pim_queue_.reserve(config_.trans_queue_size);
     if (is_unified_queue_) {
         unified_queue_.reserve(config_.trans_queue_size);
@@ -229,8 +228,6 @@ void Controller::ScheduleTransaction() {
         }
     }
 
-    // TODO: does this need additional logic? maybe scheduling 
-    // should differ depending on whether we're in PIM mode
     if (is_pim_mode_) {
         for (auto it = pim_queue_.begin(); it != pim_queue_.end(); it++) {
             auto cmd = TransToCommand(*it);

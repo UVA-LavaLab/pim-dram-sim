@@ -4041,7 +4041,6 @@ namespace Generators {
 
 template <typename Float>
 class RandomFloatingGenerator final : public IGenerator<Float> {
-    // FIXME: What is the right seed?
     std::minstd_rand m_rand;
     std::uniform_real_distribution<Float> m_dist;
     Float m_current_number;
