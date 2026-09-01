@@ -350,11 +350,16 @@ void Config::SetAddressMapping() {
     // memory addresses are byte addressable, but each request comes with
     // multiple bytes because of bus width, and burst length
     request_size_bytes = bus_width / 8 * BL;
-    shift_bits = LogBase2(request_size_bytes);
+    // we don't use request size bytes here because we want to keep BL-level
+    // granularity in the address decoding (so we can ignore burst-level
+    // decoding in pim mode)
+    shift_bits = LogBase2(bus_width / 8);
+    // PIM-relevant parameters, renamed to be more aligned with PIM use-case
     gdl_width = bus_width;
-    gdl_shift = LogBase2(gdl_width / 8);
+    gdl_shift = request_size_bytes;
     int col_low_bits = LogBase2(BL);
-    int actual_col_bits = LogBase2(columns) - col_low_bits;
+    // here, we actually expose the higher-fidelity column bits
+    int actual_col_bits = LogBase2(columns);
 
     // has to strictly follow the order of chan, rank, bg, bank, row, col
     std::map<std::string, int> field_widths;
