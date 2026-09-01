@@ -356,7 +356,6 @@ void Config::SetAddressMapping() {
     shift_bits = LogBase2(bus_width / 8);
     // PIM-relevant parameters, renamed to be more aligned with PIM use-case
     gdl_width = bus_width;
-    gdl_shift = bus_width / 8;
     int col_low_bits = LogBase2(BL);
     // here, we actually expose the higher-fidelity column bits
     int actual_col_bits = LogBase2(columns);
