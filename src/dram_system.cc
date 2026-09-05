@@ -153,6 +153,28 @@ bool JedecDRAMSystem::AddTransaction(uint64_t hex_addr, bool is_write,
   return ok;
 }
 
+bool JedecDRAMSystem::MaybeBroadcast(Command cmd) {
+// Record trace - Record address trace for debugging or other purposes
+#ifdef ADDR_TRACE
+  address_trace_ << std::hex << hex_addr << std::dec << " "
+                 << (is_write ? "WRITE " : "READ ") << clk_ << std::endl;
+#endif
+
+  uint64_t rt = config_.shift_bits + LogBase2(config_.BL);
+  int channel = cmd.Channel();
+  // bool ok =
+  //     ctrls_[channel]->WillAcceptTransaction(hex_addr, is_write) || is_pim;
+  bool ok = ctrls_[channel]->MaybeBroadcast(cmd);
+
+  // assert(ok);
+  // if (ok) {
+  //   Transaction trans = Transaction(hex_addr, is_write, is_pim);
+  //   ctrls_[channel]->AddTransaction(trans);
+  // }
+  last_req_clk_ = clk_;
+  return ok;
+}
+
 void JedecDRAMSystem::ClockTick() {
   for (size_t i = 0; i < ctrls_.size(); i++) {
     // look ahead and return earlier
@@ -192,6 +214,15 @@ bool IdealDRAMSystem::AddTransaction(uint64_t hex_addr, bool is_write,
   trans.added_cycle = clk_;
   infinite_buffer_q_.push_back(trans);
   return true;
+}
+
+bool IdealDRAMSystem::MaybeBroadcast(Command cmd) {
+  uint64_t rt = config_.shift_bits + LogBase2(config_.BL);
+  int channel = cmd.Channel();
+  bool ok = ctrls_[channel]->MaybeBroadcast(cmd);
+
+  last_req_clk_ = clk_;
+  return ok;
 }
 
 void IdealDRAMSystem::ClockTick() {

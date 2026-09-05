@@ -44,6 +44,7 @@ class MemorySystem {
 
     bool WillAcceptTransaction(uint64_t hex_addr, bool is_write) const;
     bool AddTransaction(uint64_t hex_addr, bool is_write, bool is_pim = false);
+    bool MaybeBroadcast(uint64_t cmd, uint64_t addr);
 
    private:
     // These have to be pointers because Gem5 will try to push this object

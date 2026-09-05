@@ -183,9 +183,41 @@ bool Controller::AddTransaction(Transaction trans) {
     simple_stats_.AddValue("interarrival_latency", clk_ - last_trans_clk_);
     last_trans_clk_ = clk_;
 
-    if (trans.is_pim) {
+    if (trans.is_pim && !is_pim_mode_) {
         pending_pim_q_.insert(std::make_pair(trans.addr, trans));
         pim_queue_.push_back(trans);
+        return true;
+    } else if (trans.is_pim && is_pim_mode_) {
+        pending_pim_q_.insert(std::make_pair(trans.addr, trans));
+
+        // first translate the transaction to a command
+        Command demand = TransToCommand(trans);
+        // now use that command to determine if we need to precharge / activate
+        Command ready = channel_state_.GetReadyCommand(demand, clk_);
+
+        // check validity and early exit if invalid or waiting for refresh
+        if (!ready.IsValid() || channel_state_.IsRefreshWaiting()) {
+            cmd_queue_.AddPimCommand(demand);
+            return true;
+        }
+
+        // we need to check if the queue is empty before just issuing a command
+        // this ensures proper ordering if many commands are issued in rapid
+        // succession
+        if (cmd_queue_.QueueIsEmpty(ready.Rank(), ready.Bankgroup(),
+                                    ready.Bank())) {
+            // just issue because it must be a valid command
+            IssueCommand(ready);
+            // if we need to pre/act, then we need to save the command until
+            // later
+            if (!ready.IsReadWrite()) {
+                cmd_queue_.AddPimCommand(demand);
+            }
+        } else {
+            // add to queue because we already have a pending operation
+            cmd_queue_.AddPimCommand(demand);
+        }
+
         return true;
     } else if (trans.is_write) {
         if (pending_wr_q_.count(trans.addr) == 0) {  // can not merge writes
@@ -216,6 +248,15 @@ bool Controller::AddTransaction(Transaction trans) {
         }
         return true;
     }
+}
+
+bool Controller::MaybeBroadcast(Command cmd) {
+    if (cmd_queue_.QueueIsEmpty(cmd.Rank(), cmd.Bankgroup(),
+                                    cmd.Bank())) {
+        cmd_queue_.AddCommand(cmd);
+        return true;
+    }
+    return false;
 }
 
 void Controller::ScheduleTransaction() {
@@ -290,7 +331,7 @@ void Controller::IssueCommand(const Command &cmd) {
                 exit(1);
             }
             auto it = pending_pim_q_.find(cmd.hex_addr);
-            it->second.complete_cycle = clk_ + config_.tCCD_L;
+            it->second.complete_cycle = clk_ + config_.tCCD_L - 1;
             return_queue_.push_back(it->second);
             pending_pim_q_.erase(it);
         } else {
@@ -319,7 +360,7 @@ void Controller::IssueCommand(const Command &cmd) {
                 exit(1);
             }
             auto it = pending_pim_q_.find(cmd.hex_addr);
-            it->second.complete_cycle = clk_ + config_.tCCD_L;
+            it->second.complete_cycle = clk_ + config_.tCCD_L - 1;
             return_queue_.push_back(it->second);
             pending_pim_q_.erase(it);
         } else {

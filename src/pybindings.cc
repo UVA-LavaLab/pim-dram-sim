@@ -2,6 +2,7 @@
 #include "memory_system.h"
 
 #include <functional>
+#include <memory>
 #include <new>
 #include <string>
 
@@ -287,5 +288,15 @@ EXPORT float memsys_get_tck(memsys_t memsys) {
   }
   // in case of failure, return -1
   return -1;
+}
+
+EXPORT bool memsys_send_command_to_address(memsys_t memsys,
+                                               uint64_t command_id,
+                                               uint64_t hex_address) {
+  Wrapper *w = reinterpret_cast<Wrapper *>(memsys);
+  if (w && w->memsys) {
+    return w->memsys->MaybeBroadcast(command_id, hex_address);
+  }
+  return false;
 }
 }

@@ -45,11 +45,11 @@ std::vector<Command> CommandQueue::GetPIMCommandsToIssue() {
                 continue;
             }
         }
-        auto cmd = PimGetFirstInQueue(queue);
-        if (cmd.IsValid()) {
-            if (cmd.IsReadWrite()) {
-                EraseRWCommand(cmd);
-            }
+        Command cmd;
+        bool got_cmd = PopQueuePimMode(queue, &cmd);
+        // don't need to check validity here because we already do that in
+        // the above function call
+        if (got_cmd) {
             cmds.push_back(cmd);
         }
     }
@@ -151,6 +151,10 @@ bool CommandQueue::QueueEmpty() const {
     return true;
 }
 
+void CommandQueue::AddPimCommand(Command cmd) {
+    auto& queue = GetQueue(cmd.Rank(), cmd.Bankgroup(), cmd.Bank());
+    queue.push_back(cmd);
+}
 
 bool CommandQueue::AddCommand(Command cmd) {
     auto& queue = GetQueue(cmd.Rank(), cmd.Bankgroup(), cmd.Bank());
@@ -203,20 +207,33 @@ CMDQueue& CommandQueue::GetQueue(int rank, int bankgroup, int bank) {
     return queues_[index];
 }
 
-Command CommandQueue::PimGetFirstInQueue(CMDQueue &queue) const {
+// this variant can't be const because it mutates state
+bool CommandQueue::PopQueuePimMode(CMDQueue &queue, Command* out_cmd) {
     for (auto cmd_it = queue.begin(); cmd_it != queue.end(); cmd_it++) {
         Command cmd = channel_state_.GetReadyCommand(*cmd_it, clk_);
         if (!cmd.IsValid()) {
-            continue;
+            // in PIM variant, early exit if we can't do anything
+            // this prevents command reordering
+            return false;
         }
-        if (cmd.cmd_type == CommandType::PRECHARGE) {
-            if (!ArbitratePrecharge(cmd_it, queue)) {
-                continue;
-            }
-        } 
-        return cmd;
+
+        // if (cmd.cmd_type == CommandType::PRECHARGE) {
+        //     if (!ArbitratePrecharge(cmd_it, queue)) {
+        //         return false;
+        //     }
+        // }
+
+        // return the command
+        (*out_cmd) = cmd;
+
+        // erase the queued element if and only if it is the ready command
+        if (cmd.cmd_type == cmd_it->cmd_type) {
+            queue.erase(cmd_it);
+        }
+
+        return true;
     }
-    return Command();
+    return false;
 }
 
 Command CommandQueue::GetFirstReadyInQueue(CMDQueue& queue) const {

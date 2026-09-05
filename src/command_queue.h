@@ -25,6 +25,7 @@ class CommandQueue {
     bool WillAcceptCommand(int rank, int bankgroup, int bank) const;
     bool QueueIsEmpty(int rank, int bankgroup, int bank) const;
     bool AddCommand(Command cmd);
+    void AddPimCommand(Command cmd);
     bool QueueEmpty() const;
     int QueueUsage() const;
     std::vector<bool> rank_q_empty;
@@ -34,7 +35,7 @@ class CommandQueue {
                             const CMDQueue& queue) const;
     bool HasRWDependency(const CMDIterator& cmd_it,
                          const CMDQueue& queue) const;
-    Command PimGetFirstInQueue(CMDQueue& queue) const;
+    bool PopQueuePimMode(CMDQueue& queue, Command* out_cmd);
     Command GetFirstReadyInQueue(CMDQueue& queue) const;
     int GetQueueIndex(int rank, int bankgroup, int bank) const;
     CMDQueue& GetQueue(int rank, int bankgroup, int bank);

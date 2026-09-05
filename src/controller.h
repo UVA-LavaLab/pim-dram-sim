@@ -32,6 +32,7 @@ class Controller {
     void SetPimMode(bool mode);
     bool WillAcceptTransaction(uint64_t hex_addr, bool is_write) const;
     bool AddTransaction(Transaction trans);
+    bool MaybeBroadcast(Command cmd);
     int QueueUsage() const;
     // Stats output
     void PrintEpochStats();

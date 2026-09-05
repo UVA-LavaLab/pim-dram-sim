@@ -296,6 +296,15 @@ HMCMemorySystem::HMCMemorySystem(Config &config, const std::string &output_dir,
     }
 }
 
+bool HMCMemorySystem::MaybeBroadcast(Command cmd) {
+  uint64_t rt = config_.shift_bits + LogBase2(config_.BL);
+  int channel = cmd.Channel();
+  bool ok = ctrls_[channel]->MaybeBroadcast(cmd);
+
+  last_req_clk_ = clk_;
+  return ok;
+}
+
 HMCMemorySystem::~HMCMemorySystem() {
     for (auto &&vault_ptr : ctrls_) {
         delete (vault_ptr);

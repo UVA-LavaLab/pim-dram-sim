@@ -32,6 +32,7 @@ class BaseDRAMSystem {
     virtual bool WillAcceptTransaction(uint64_t hex_addr,
                                        bool is_write) const = 0;
     virtual bool AddTransaction(uint64_t hex_addr, bool is_write, bool is_pim = false) = 0;
+    virtual bool MaybeBroadcast(Command cmd) = 0;
     virtual void ClockTick() = 0;
     int GetChannel(uint64_t hex_addr) const;
     bool GetPimMode() const { return pim_mode_; };
@@ -76,6 +77,7 @@ class JedecDRAMSystem : public BaseDRAMSystem {
     ~JedecDRAMSystem();
     bool WillAcceptTransaction(uint64_t hex_addr, bool is_write) const override;
     bool AddTransaction(uint64_t hex_addr, bool is_write, bool is_pim = false) override;
+    bool MaybeBroadcast(Command cmd) override;
     void ClockTick() override;
 };
 
@@ -93,6 +95,7 @@ class IdealDRAMSystem : public BaseDRAMSystem {
         return true;
     };
     bool AddTransaction(uint64_t hex_addr, bool is_write, bool is_pim = false) override;
+    bool MaybeBroadcast(Command cmd) override;
     void ClockTick() override;
 
    private:

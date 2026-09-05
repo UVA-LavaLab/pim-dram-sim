@@ -22,6 +22,8 @@ class BankState {
     bool IsRowOpen() const { return state_ == State::OPEN; }
     int OpenRow() const { return open_row_; }
     int RowHitCount() const { return row_hit_count_; }
+    bool MaybePre();
+    bool MaybeAct(int row);
 
    private:
     // Current state of the Bank

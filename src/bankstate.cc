@@ -36,6 +36,13 @@ Command BankState::GetReadyCommand(const Command& cmd, uint64_t clk) const {
                 case CommandType::SREF_ENTER:
                     required_type = cmd.cmd_type;
                     break;
+                case CommandType::ACTIVATE:
+                    required_type = cmd.cmd_type;
+                    break;
+                case CommandType::PRECHARGE:
+                    std::cerr << "Fatal: Attempted to precharge bank with no open rows!" << std::endl;
+                    AbruptExit(__FILE__, __LINE__);
+                    break;
                 default:
                     std::cerr << "Unknown type!" << std::endl;
                     AbruptExit(__FILE__, __LINE__);
@@ -58,6 +65,13 @@ Command BankState::GetReadyCommand(const Command& cmd, uint64_t clk) const {
                 case CommandType::REFRESH_BANK:
                 case CommandType::SREF_ENTER:
                     required_type = CommandType::PRECHARGE;
+                    break;
+                case CommandType::PRECHARGE:
+                    required_type = cmd.cmd_type;
+                    break;
+                case CommandType::ACTIVATE:
+                    std::cerr << "Fatal: Attempted to activate more than one row!" << std::endl;
+                    AbruptExit(__FILE__, __LINE__);
                     break;
                 default:
                     std::cerr << "Unknown type!" << std::endl;
@@ -191,6 +205,14 @@ void BankState::UpdateTiming(CommandType cmd_type, uint64_t time) {
     cmd_timing_[static_cast<int>(cmd_type)] =
         std::max(cmd_timing_[static_cast<int>(cmd_type)], time);
     return;
+}
+
+// TODO: make this no longer a noop
+bool BankState::MaybePre() {
+    if (IsRowOpen()) {
+        return true;
+    }
+    return false;
 }
 
 }  // namespace dramsim3

@@ -11,7 +11,7 @@ extern "C" {
 
 typedef void *memsys_t;
 typedef void (*dramsim_callback_t)(uint64_t addr);
-typedef void (*context_callback_t)(void* context, uint64_t addr);
+typedef void (*context_callback_t)(void *context, uint64_t addr);
 EXPORT memsys_t memsys_create(const char *config_file, const char *output_dir,
                               dramsim_callback_t read_callback,
                               dramsim_callback_t write_callback);
@@ -62,6 +62,9 @@ EXPORT void memsys_get_local_from_spatial(memsys_t memsys, uint64_t *channel,
                                           uint64_t *bank, uint64_t *local_addr,
                                           uint64_t hex_address);
 EXPORT uint64_t memsys_get_global_from_spatial(memsys_t memsys,
+                                               uint64_t hex_address);
+EXPORT bool memsys_send_command_to_address(memsys_t memsys,
+                                               uint64_t command_id,
                                                uint64_t hex_address);
 }
 
